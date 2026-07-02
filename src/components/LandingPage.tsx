@@ -466,7 +466,7 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
             </div>
           </div>
 
-          {/* Footer Call to Action with Google Button */}
+          {/* Footer Call to Action with Facebook Button */}
           <div className="mt-16 text-center bg-indigo-900 rounded-3xl text-white p-8 md:p-12 relative overflow-hidden shadow-xl">
             <div className="absolute inset-0 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px] opacity-10"></div>
             

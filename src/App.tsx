@@ -26,8 +26,13 @@ const DEFAULT_PARAMS: NestingParams = {
 };
 
 export default function App() {
-  const [user, setUser] = useState<any>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = useState<any>({
+    displayName: 'Membro Comunidade DTF',
+    email: 'membro@comunidade.com',
+    photoURL: null,
+    isFacebook: true
+  });
+  const [authLoading, setAuthLoading] = useState(false);
   const [params, setParams] = useState<NestingParams>(DEFAULT_PARAMS);
   const [artwork, setArtwork] = useState<Artwork | null>(null);
   const [nestingResult, setNestingResult] = useState<NestingResult>({
@@ -42,32 +47,6 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState<'text' | 'upload'>('text');
   const [currentModule, setCurrentModule] = useState<'plotter' | 'dtf'>('plotter');
-
-  // Monitor real-time authentication state
-  useEffect(() => {
-    const isFacebookSubscribed = localStorage.getItem('facebook_subscribed') === 'true';
-    if (isFacebookSubscribed) {
-      setUser({
-        displayName: 'Membro do Facebook',
-        email: 'facebook@comunidade.com',
-        photoURL: null,
-        isFacebook: true
-      });
-      setAuthLoading(false);
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) {
-        setUser(currentUser);
-      } else if (user && !user.isDemo && !user.isFacebook) {
-        setUser(null);
-      }
-      setAuthLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   // Initialize with a beautiful default text artwork on first load
   useEffect(() => {
@@ -253,35 +232,12 @@ export default function App() {
 
             <div className="h-8 w-[1px] bg-slate-100 hidden md:block"></div>
 
-            {/* Logged in user profile & sign out */}
-            <div className="flex items-center gap-3 bg-slate-50 p-1.5 pr-3 rounded-2xl border border-slate-100">
-              {user.photoURL ? (
-                <img 
-                  src={user.photoURL} 
-                  referrerPolicy="no-referrer" 
-                  alt={user.displayName || "Usuário"} 
-                  className="w-8 h-8 rounded-xl object-cover shadow-xs border border-white"
-                />
-              ) : (
-                <div className="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold shadow-xs">
-                  <UserIcon className="w-4 h-4" />
-                </div>
-              )}
-              <div className="flex flex-col text-left">
-                <span className="text-xs font-black text-slate-800 leading-none truncate max-w-[120px]">
-                  {user.displayName || 'Usuário'}
-                </span>
-                <span className="text-[9px] text-slate-400 font-semibold leading-tight truncate max-w-[120px]">
-                  {user.email || 'Conectado'}
-                </span>
-              </div>
-              <button
-                onClick={handleLogout}
-                title="Sair da Conta"
-                className="ml-2 w-7 h-7 rounded-lg hover:bg-rose-50 hover:text-rose-600 text-slate-400 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+            {/* Active Membership Badge */}
+            <div className="flex items-center gap-2 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-100/60 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span className="text-[11px] font-black text-emerald-800 uppercase tracking-wider">
+                Acesso Liberado (Lá Ele) 😂
+              </span>
             </div>
           </div>
         </div>
