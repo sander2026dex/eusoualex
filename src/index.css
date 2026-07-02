@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+@media print {
+  body {
+    display: none !important;
+  }
+}
+
+/* Blur protection for screenshot capture and focus loss */
+.screenshot-blur {
+  filter: blur(14px) !important;
+  pointer-events: none !important;
+  user-select: none !important;
+  transition: filter 0.25s ease-in-out;
+}

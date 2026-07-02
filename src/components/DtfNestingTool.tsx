@@ -17,6 +17,7 @@ import {
   MAX_CANVAS_SLICE_HEIGHT_CM 
 } from '../utils/dtfPacker';
 import { canvasToTiffBlob } from '../utils/canvasToTiff';
+import { auth } from '../lib/firebase';
 import { 
   Upload, 
   Trash2, 
@@ -94,6 +95,64 @@ export default function DtfNestingTool() {
   const [showAppliedToast, setShowAppliedToast] = useState<boolean>(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Screen/Print Protection states
+  const [currentUserEmail, setCurrentUserEmail] = useState<string>('Membro Comunidade DTF');
+  const [isScreenProtected, setIsScreenProtected] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Get logged-in user email for personalized watermark
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user && user.email) {
+        setCurrentUserEmail(user.email);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // Anti-Print, Screenshot Blur, and Right-click context protection
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent browser print command (Ctrl+P or Cmd+P)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        alert('⚠️ PROTEÇÃO ATIVA: A impressão direta de tela foi desativada para proteger os layouts e a propriedade intelectual da estamparia. Utilize os botões oficiais na barra lateral para gerar e exportar arquivos prontos (PNG, PDF ou TIFF).');
+      }
+
+      // Detect PrintScreen shortcut triggers (blur elements briefly)
+      if (e.key === 'PrintScreen' || e.key === 'PrtScn') {
+        setIsScreenProtected(true);
+        setTimeout(() => setIsScreenProtected(false), 2000);
+        alert('⚠️ CÓPIA DE TELA BLOQUEADA: Captura de tela direta não permitida.');
+      }
+    };
+
+    const handleCopy = (e: ClipboardEvent) => {
+      e.preventDefault();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('copy', handleCopy);
+
+    // Dynamic Blur Protection on focus-loss (intercepts screenshots/tab switching)
+    const handleBlur = () => {
+      setIsScreenProtected(true);
+    };
+
+    const handleFocus = () => {
+      setIsScreenProtected(false);
+    };
+
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('copy', handleCopy);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   // Trigger nesting automatically whenever params or uploadedImages list changes
   useEffect(() => {
@@ -605,7 +664,7 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
   };
 
   return (
-    <div id="dtf-nesting-root" className="flex-1 bg-slate-900 text-slate-100 flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+    <div id="dtf-nesting-root" className={`flex-1 bg-slate-900 text-slate-100 flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden transition-all duration-300 ${isScreenProtected ? 'screenshot-blur' : ''}`}>
       
       {/* Sidebar Controls - Custom styled in Deep blue/slate dark theme */}
       <aside className="w-full md:w-80 bg-[#141E33] border-r border-slate-800 flex flex-col justify-between shrink-0 overflow-y-auto">
@@ -822,10 +881,10 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
                 <button
                   type="button"
                   onClick={() => setExportFormat('png')}
-                  className={`py-1.5 px-2 rounded-md text-xs font-black transition-all cursor-pointer text-center ${
+                  className={`py-1.5 px-2 rounded-md text-xs font-black transition-all duration-150 cursor-pointer text-center ${
                     exportFormat === 'png'
-                      ? 'bg-cyan-500 text-slate-950 shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/10 font-black'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
                   }`}
                 >
                   PNG
@@ -833,10 +892,10 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
                 <button
                   type="button"
                   onClick={() => setExportFormat('pdf')}
-                  className={`py-1.5 px-2 rounded-md text-xs font-black transition-all cursor-pointer text-center ${
+                  className={`py-1.5 px-2 rounded-md text-xs font-black transition-all duration-150 cursor-pointer text-center ${
                     exportFormat === 'pdf'
-                      ? 'bg-cyan-500 text-slate-950 shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-rose-500 text-slate-950 shadow-md shadow-rose-500/10 font-black'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
                   }`}
                 >
                   PDF
@@ -844,10 +903,10 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
                 <button
                   type="button"
                   onClick={() => setExportFormat('tiff')}
-                  className={`py-1.5 px-2 rounded-md text-xs font-black transition-all cursor-pointer text-center ${
+                  className={`py-1.5 px-2 rounded-md text-xs font-black transition-all duration-150 cursor-pointer text-center ${
                     exportFormat === 'tiff'
-                      ? 'bg-cyan-500 text-slate-950 shadow-xs'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-indigo-500 text-slate-950 shadow-md shadow-indigo-500/10 font-black'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
                   }`}
                 >
                   TIFF (.tif)
@@ -920,7 +979,7 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
             type="button"
             onClick={handleAssembleAndDownload}
             disabled={isAssembling || uploadedImages.length === 0}
-            className="w-full bg-cyan-500 hover:bg-cyan-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 font-black text-xs py-3.5 px-4 rounded-xl shadow-md shadow-cyan-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-white font-black text-xs py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
           >
             {isAssembling ? (
               <>
@@ -987,8 +1046,9 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
           <div className="flex items-center gap-3">
             <button
               onClick={loadSampleDtf}
-              className="bg-slate-800 hover:bg-slate-700 border border-slate-700/60 text-slate-300 font-bold text-[11px] px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer"
+              className="bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/35 hover:border-indigo-500/55 text-indigo-300 font-black text-[11px] px-3.5 py-1.5 rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1.5 shadow-sm active:scale-95"
             >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
               Carregar Estampas de Demonstração
             </button>
             {uploadedImages.length > 0 && (
@@ -997,7 +1057,7 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
                   setUploadedImages([]);
                   setPackResult(null);
                 }}
-                className="hover:bg-rose-500/10 hover:text-rose-400 border border-transparent hover:border-rose-500/20 text-slate-400 font-bold text-[11px] px-3.5 py-1.5 rounded-lg transition-colors cursor-pointer flex items-center gap-1"
+                className="bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 hover:border-rose-500/45 text-rose-400 font-black text-[11px] px-3.5 py-1.5 rounded-lg transition-all duration-150 cursor-pointer flex items-center gap-1 shadow-sm active:scale-95"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Limpar Tudo
@@ -1297,13 +1357,23 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
                       {/* Render simulated vector grid inside a scrollable sheet container to show true scale */}
                       <div className="max-h-[500px] overflow-y-auto pr-1.5 border border-slate-800 rounded-xl bg-slate-950/40 p-2 scrollbar-thin">
                         <div 
-                          className="bg-slate-950 border border-slate-800/80 rounded-xl relative overflow-hidden transition-all duration-300"
+                          onContextMenu={(e) => e.preventDefault()}
+                          className="bg-slate-950 border border-slate-800/80 rounded-xl relative overflow-hidden transition-all duration-300 select-none"
                           style={{
                             width: params.widthCm === 56 ? '320px' : '200px',
                             // Dynamic height to maintain physical aspect ratio
                             height: `${Math.max(200, Math.round((params.widthCm === 56 ? 320 : 200) * (packResult.sheets[selectedSheetIndex].heightCm / packResult.sheets[selectedSheetIndex].widthCm)))}px`,
                           }}
                         >
+                          {/* Screenshot protective repeating watermark overlay */}
+                          <div 
+                            className="absolute inset-0 z-30 pointer-events-none mix-blend-overlay opacity-30 select-none"
+                            style={{
+                              backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'><text x='10' y='50' fill='rgba(255,255,255,0.18)' font-size='6.5' font-family='sans-serif' font-weight='bold' transform='rotate(-22 80 50)'>${currentUserEmail.substring(0, 26)}</text></svg>")`,
+                              backgroundRepeat: 'repeat',
+                            }}
+                          ></div>
+
                           {/* Background checkerboard grid pattern */}
                           <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:16px_16px] opacity-35"></div>
                           
@@ -1645,7 +1715,7 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
                           setShowAppliedToast(true);
                           setTimeout(() => setShowAppliedToast(false), 2000);
                         }}
-                        className="w-full bg-gradient-to-r from-cyan-500 to-indigo-500 hover:from-cyan-400 hover:to-indigo-400 text-slate-950 font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl shadow-lg transition-all transform active:scale-[0.98] flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl shadow-lg transition-all duration-150 transform active:scale-[0.96] flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         Aplicar Ajustes
@@ -1734,10 +1804,21 @@ INSTRUÇÕES DO OPERADOR DA PLOTTER:
 
                 {/* Área de Visualização Gráfica Interativa da Simulação */}
                 <div className="flex-1 flex flex-col gap-5">
-                  <div className={`flex-1 min-h-[350px] border border-slate-800 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center p-6 transition-colors duration-300 ${
+                  <div 
+                    onContextMenu={(e) => e.preventDefault()}
+                    className={`flex-1 min-h-[350px] border border-slate-800 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center p-6 transition-colors duration-300 select-none ${
                     simulateBg === 'black' ? 'bg-slate-950' :
                     simulateBg === 'colored' ? 'bg-red-950/90' : 'bg-slate-200'
                   }`}>
+                    {/* Screenshot protective repeating watermark overlay */}
+                    <div 
+                      className="absolute inset-0 z-30 pointer-events-none mix-blend-overlay opacity-30 select-none"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='100' viewBox='0 0 160 100'><text x='10' y='50' fill='rgba(255,255,255,0.18)' font-size='6.5' font-family='sans-serif' font-weight='bold' transform='rotate(-22 80 50)'>${currentUserEmail.substring(0, 26)}</text></svg>")`,
+                        backgroundRepeat: 'repeat',
+                      }}
+                    ></div>
+
                     {/* Background checkerboard grid pattern para simular transparência/malha do tecido */}
                     <div className={`absolute inset-0 [background-size:20px_20px] opacity-15 pointer-events-none ${
                       simulateBg === 'white' 
