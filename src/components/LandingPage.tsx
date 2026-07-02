@@ -56,9 +56,22 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col antialiased font-sans text-slate-800">
-      {/* Top Banner alert about sandbox environments */}
-      <div className="bg-amber-50 border-b border-amber-100 text-amber-800 text-xs px-4 py-2.5 text-center font-medium">
-        <span>⚠️ Se estiver visualizando a ferramenta dentro do painel do AI Studio, o login do Google pode ser restrito pelo navegador. Caso ocorra, use o botão de bypass abaixo do botão de login.</span>
+      {/* Top Banner with Facebook Link */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-xs px-4 py-2.5 text-center font-semibold flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-3 shadow-xs">
+        <span className="flex items-center gap-1.5">
+          <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Curta a nossa página no Facebook e participe do nosso grupo!
+        </span>
+        <a 
+          href="https://www.facebook.com/share/g/18kRWkFsXb/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="underline hover:text-cyan-200 transition-colors font-extrabold flex items-center gap-1"
+        >
+          Clique aqui para se inscrever →
+        </a>
       </div>
 
       {/* Navigation Header */}
