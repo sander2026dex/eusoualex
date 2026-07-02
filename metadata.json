@@ -1,0 +1,6 @@
+{
+  "name": "Gerador de Filme de Recorte",
+  "description": "Ferramenta profissional para distribuição automática (nesting) e geração de arquivos vetoriais (PDF, SVG, DXF) para filme de recorte.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
