@@ -31,15 +31,42 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
   const [countdown, setCountdown] = useState(3);
 
   const handleFacebookUnlock = () => {
-    // Open the Facebook page/group link directly
-    window.open('https://www.facebook.com/share/g/18kRWkFsXb/', '_blank');
+    setError(null);
+    const width = 650;
+    const height = 800;
     
+    // Calculate coordinates to center the window on the user's screen
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    
+    let popup: Window | null = null;
+    try {
+      popup = window.open(
+        'https://www.facebook.com/share/g/1VBBsEyRMD/',
+        'FacebookGroupPopup',
+        `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes,status=no,location=no,menubar=no`
+      );
+    } catch (e) {
+      console.error('Erro ao tentar abrir pop-up:', e);
+    }
+
+    if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+      setError(
+        '⚠️ O navegador bloqueou a janela pop-up do Facebook. Por favor, permita a abertura de pop-ups para este site nas configurações do seu navegador (na barra de endereços) e tente novamente.'
+      );
+      setUnlockStatus('idle');
+      return;
+    }
+
     setUnlockStatus('verifying');
     setCountdown(3);
 
     const interval = setInterval(() => {
+      // Check if popup was closed by the user or if countdown has finished
+      const isClosed = !popup || popup.closed;
+
       setCountdown((prev) => {
-        if (prev <= 1) {
+        if (prev <= 1 || isClosed) {
           clearInterval(interval);
           setUnlockStatus('success');
           
@@ -72,7 +99,7 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
           Curta a nossa página no Facebook e participe do nosso grupo!
         </span>
         <a 
-          href="https://www.facebook.com/share/g/18kRWkFsXb/" 
+          href="https://www.facebook.com/share/g/1VBBsEyRMD/" 
           target="_blank" 
           rel="noopener noreferrer"
           className="underline hover:text-cyan-200 transition-colors font-extrabold flex items-center gap-1"
@@ -104,7 +131,7 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
           <button
             onClick={handleFacebookUnlock}
             disabled={unlockStatus !== 'idle'}
-            className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer"
+            className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:scale-95 disabled:bg-blue-400 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-xs transition-all duration-150 cursor-pointer"
           >
             {unlockStatus === 'verifying' ? (
               <>
@@ -118,7 +145,7 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
-                Liberar pelo Facebook
+                Entrar no Grupo Oficial
               </>
             )}
           </button>
@@ -179,12 +206,12 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
               {unlockStatus === 'idle' ? (
                 <button
                   onClick={handleFacebookUnlock}
-                  className="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm py-4 px-6 rounded-2xl shadow-md shadow-blue-200 transition-all duration-200 cursor-pointer animate-pulse"
+                  className="w-full flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-sm py-4 px-6 rounded-2xl shadow-md shadow-blue-200 transition-all duration-150 cursor-pointer"
                 >
                   <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
-                  CLIQUE AQUI PARA SE INSCREVER
+                  Entrar no Grupo Oficial
                 </button>
               ) : unlockStatus === 'verifying' ? (
                 <div className="w-full bg-slate-50 border border-slate-100 p-5 rounded-2xl flex flex-col items-center justify-center text-center">
@@ -467,7 +494,7 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
               <button
                 onClick={handleFacebookUnlock}
                 disabled={unlockStatus !== 'idle'}
-                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black text-sm py-3.5 px-6 rounded-xl transition-all cursor-pointer"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-sm py-3.5 px-6 rounded-xl transition-all duration-150 cursor-pointer disabled:bg-blue-400"
               >
                 {unlockStatus === 'verifying' ? (
                   <>
@@ -481,7 +508,7 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
                     <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
-                    Se Inscrever no Facebook & Liberar
+                    Entrar no Grupo Oficial
                   </>
                 )}
               </button>
