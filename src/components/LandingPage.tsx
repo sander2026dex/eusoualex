@@ -14,7 +14,8 @@ import {
   HelpCircle,
   FileCode,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Sliders
 } from 'lucide-react';
 import { auth } from '../lib/firebase';
 
@@ -298,6 +299,88 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
                 <h4 className="text-base font-black text-slate-900">Exportação SVG Real-Scale</h4>
                 <p className="mt-2 text-xs text-slate-500 leading-relaxed font-medium">
                   Exporte em formato vetorial com escala de 100% real (centímetros e milímetros) para abrir perfeitamente em programas de plotter como Silhouette Studio, Flexi ou SignMaster.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Latest Updates Section */}
+      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#4f46e5_1px,transparent_1px)] [background-size:24px_24px] opacity-15"></div>
+        <div className="max-w-6xl mx-auto px-6 relative z-10">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 text-indigo-300 text-xs font-black rounded-full mb-4 border border-indigo-500/20">
+              <Sparkles className="w-3 h-3 text-indigo-400" />
+              NOVIDADES - ÚLTIMAS ATUALIZAÇÕES
+            </span>
+            <h3 className="text-3xl md:text-4xl font-black tracking-tight text-white">
+              Recursos de Ponta que Entraram na Ferramenta
+            </h3>
+            <p className="mt-3 text-slate-400 font-medium text-sm">
+              Implementamos os recursos mais solicitados por profissionais de estamparia e DTF para otimizar ao máximo o seu fluxo de trabalho.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* Update 1 */}
+            <div className="flex gap-4 p-6 rounded-2xl bg-slate-800/50 border border-slate-800 hover:border-indigo-500/30 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
+                <Sliders className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="text-lg font-black text-white flex items-center gap-2">
+                  Simulador de Sangria (White Choke)
+                  <span className="text-[9px] bg-indigo-600 text-white font-extrabold px-1.5 py-0.5 rounded-full uppercase tracking-wider">Ativo</span>
+                </h4>
+                <p className="mt-2 text-xs text-slate-400 leading-relaxed font-medium">
+                  Controle a <strong>sangria de linhas finas</strong>, <strong>sangria de sólidos</strong> e a <strong>densidade da tinta branca</strong> para que a base branca não "vaze" ou escape por baixo da estampa colorida ao prensar.
+                </p>
+              </div>
+            </div>
+
+            {/* Update 2 */}
+            <div className="flex gap-4 p-6 rounded-2xl bg-slate-800/50 border border-slate-800 hover:border-indigo-500/30 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0">
+                <Layers className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="text-lg font-black text-white flex items-center gap-2">
+                  Filtros de Camadas (CMYK x White)
+                </h4>
+                <p className="mt-2 text-xs text-slate-400 leading-relaxed font-medium">
+                  Alterne a visualização em tempo real entre a imagem colorida, apenas a base branca ou ambas integradas sobre fundos pretos, brancos ou coloridos, simulando o tecido real de camisetas.
+                </p>
+              </div>
+            </div>
+
+            {/* Update 3 */}
+            <div className="flex gap-4 p-6 rounded-2xl bg-slate-800/50 border border-slate-800 hover:border-indigo-500/30 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0">
+                <FileCode className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="text-lg font-black text-white flex items-center gap-2">
+                  Formatos de Exportação Profissional
+                </h4>
+                <p className="mt-2 text-xs text-slate-400 leading-relaxed font-medium">
+                  Exporte o rolo de DTF completo em alta definição em <strong>TIFF com canal alfa de transparência</strong>, <strong>PDF com vetorização real</strong> ou o tradicional arquivo de imagem <strong>PNG</strong>.
+                </p>
+              </div>
+            </div>
+
+            {/* Update 4 */}
+            <div className="flex gap-4 p-6 rounded-2xl bg-slate-800/50 border border-slate-800 hover:border-indigo-500/30 transition-all">
+              <div className="w-12 h-12 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0">
+                <HelpCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="text-lg font-black text-white flex items-center gap-2">
+                  Redimensionamento em Lote (cm)
+                </h4>
+                <p className="mt-2 text-xs text-slate-400 leading-relaxed font-medium">
+                  Defina a largura ou altura em centímetros para cada imagem de forma proporcional, com cadeado de proporções, ou replique as mesmas medidas exatas para todas as artes importadas de uma vez só.
                 </p>
               </div>
             </div>
