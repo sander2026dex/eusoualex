@@ -32,6 +32,11 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
 
   const handleFacebookUnlock = () => {
     setError(null);
+    setUnlockStatus('success');
+    
+    // Save persistence to localStorage so user doesn't have to follow again on reload
+    localStorage.setItem('facebook_subscribed', 'true');
+    
     const width = 650;
     const height = 800;
     
@@ -51,41 +56,23 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
     }
 
     if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-      setError(
-        '⚠️ O navegador bloqueou a janela pop-up do Facebook. Por favor, permita a abertura de pop-ups para este site nas configurações do seu navegador (na barra de endereços) e tente novamente.'
-      );
-      setUnlockStatus('idle');
-      return;
+      // In case popup is blocked, open in a new tab instead
+      try {
+        window.open('https://www.facebook.com/share/g/1VBBsEyRMD/', '_blank');
+      } catch (err) {
+        console.error('Fallback failed:', err);
+      }
     }
 
-    setUnlockStatus('verifying');
-    setCountdown(3);
-
-    const interval = setInterval(() => {
-      // Check if popup was closed by the user or if countdown has finished
-      const isClosed = !popup || popup.closed;
-
-      setCountdown((prev) => {
-        if (prev <= 1 || isClosed) {
-          clearInterval(interval);
-          setUnlockStatus('success');
-          
-          // Save persistence to localStorage so user doesn't have to follow again on reload
-          localStorage.setItem('facebook_subscribed', 'true');
-          
-          setTimeout(() => {
-            onLoginSuccess({
-              displayName: 'Membro do Facebook',
-              email: 'facebook@comunidade.com',
-              photoURL: null,
-              isFacebook: true
-            });
-          }, 1500);
-          return 0;
-        }
-        return prev - 1;
+    // Immediately trigger success callback with a minor delay for animated feedback
+    setTimeout(() => {
+      onLoginSuccess({
+        displayName: 'Membro do Facebook',
+        email: 'facebook@comunidade.com',
+        photoURL: null,
+        isFacebook: true
       });
-    }, 1000);
+    }, 500);
   };
 
   return (
