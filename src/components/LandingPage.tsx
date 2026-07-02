@@ -16,8 +16,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
-import { auth, googleProvider, signInWithPopup } from '../lib/firebase';
-import { signInWithCredential, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from '../lib/firebase';
 
 interface LandingPageProps {
   onLoginSuccess: (user: any) => void;
@@ -199,20 +198,6 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
                   <span className="text-[10px] font-semibold text-emerald-600 mt-0.5">Desbloqueando e abrindo ferramenta...</span>
                 </div>
               )}
-
-              <div className="flex items-center my-1">
-                <div className="flex-1 border-t border-slate-150"></div>
-                <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold px-3">Após a inscrição o acesso é liberado</span>
-                <div className="flex-1 border-t border-slate-150"></div>
-              </div>
-
-              <button
-                onClick={onBypassLogin}
-                className="w-full bg-white hover:bg-slate-50 text-indigo-600 border border-indigo-200 font-bold text-xs py-3 px-5 rounded-2xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
-                Acesso sem login (Bypass Instantâneo)
-              </button>
             </div>
 
             <p className="mt-4 text-[11px] text-slate-400 font-medium">
@@ -416,14 +401,6 @@ export default function LandingPage({ onLoginSuccess, onBypassLogin }: LandingPa
                     Se Inscrever no Facebook & Liberar
                   </>
                 )}
-              </button>
-
-              <button
-                onClick={onBypassLogin}
-                className="w-full sm:w-auto bg-indigo-850/80 hover:bg-indigo-800 text-indigo-100 border border-indigo-700/60 font-bold text-xs py-3 px-5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                Acesso sem login (Iframe Bypass)
               </button>
             </div>
           </div>
