@@ -45,10 +45,22 @@ export default function App() {
 
   // Monitor real-time authentication state
   useEffect(() => {
+    const isFacebookSubscribed = localStorage.getItem('facebook_subscribed') === 'true';
+    if (isFacebookSubscribed) {
+      setUser({
+        displayName: 'Membro do Facebook',
+        email: 'facebook@comunidade.com',
+        photoURL: null,
+        isFacebook: true
+      });
+      setAuthLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-      } else if (user && !user.isDemo) {
+      } else if (user && !user.isDemo && !user.isFacebook) {
         setUser(null);
       }
       setAuthLoading(false);
@@ -124,7 +136,8 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-    if (user?.isDemo) {
+    localStorage.removeItem('facebook_subscribed');
+    if (user?.isDemo || user?.isFacebook) {
       setUser(null);
     } else {
       try {
