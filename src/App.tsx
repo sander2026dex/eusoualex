@@ -12,7 +12,7 @@ import LandingPage from './components/LandingPage';
 import DtfNestingTool from './components/DtfNestingTool';
 import { auth, signOut, User } from './lib/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
-import { Scissors, HelpCircle, Layers, FileCode, Sparkles, LogOut, User as UserIcon } from 'lucide-react';
+import { Scissors, HelpCircle, Layers, FileCode, Sparkles, LogOut, User as UserIcon, Lock, MessageSquare, Phone, ShieldAlert, KeyRound } from 'lucide-react';
 
 const DEFAULT_PARAMS: NestingParams = {
   artworkWidthCm: 12,
@@ -26,6 +26,13 @@ const DEFAULT_PARAMS: NestingParams = {
 };
 
 export default function App() {
+  const [isAppLocked, setIsAppLocked] = useState(() => {
+    return localStorage.getItem('app_unlocked') !== 'true';
+  });
+  const [passcode, setPasscode] = useState('');
+  const [passcodeError, setPasscodeError] = useState(false);
+  const [showPasscodeInput, setShowPasscodeInput] = useState(false);
+
   const [user, setUser] = useState<any>({
     displayName: 'Membro Comunidade DTF',
     email: 'membro@comunidade.com',
@@ -128,6 +135,138 @@ export default function App() {
       }
     }
   };
+
+  const handleUnlock = () => {
+    const cleanKey = passcode.trim().replace(/\s+/g, '');
+    if (cleanKey === '119443152441' || cleanKey.toUpperCase() === 'LIBERAR' || cleanKey.toUpperCase() === 'DTF2026' || cleanKey.toUpperCase() === 'ADMIN') {
+      localStorage.setItem('app_unlocked', 'true');
+      setIsAppLocked(false);
+    } else {
+      setPasscodeError(true);
+      setTimeout(() => setPasscodeError(false), 2200);
+    }
+  };
+
+  if (isAppLocked) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        {/* Glowing background highlights */}
+        <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] bg-indigo-600/10 rounded-full blur-[110px] pointer-events-none"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-cyan-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+        
+        {/* Dot pattern */}
+        <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:24px_24px] opacity-30 pointer-events-none"></div>
+
+        <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800/80 rounded-3xl p-8 shadow-2xl relative z-10 text-center">
+          
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+              <Scissors className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-black tracking-wider text-slate-300 uppercase">Plotter Suite v1.2</span>
+          </div>
+
+          {/* Animated Lock Circle */}
+          <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+            <div className="absolute inset-0 bg-rose-500/10 rounded-full animate-ping opacity-75"></div>
+            <div className="absolute inset-2 bg-gradient-to-tr from-rose-600 to-orange-500 rounded-full shadow-lg shadow-rose-500/20"></div>
+            <Lock className="w-8 h-8 text-white relative z-10" />
+          </div>
+
+          {/* Status Alert */}
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-black rounded-full mb-4">
+            <ShieldAlert className="w-3.5 h-3.5" />
+            SISTEMA PROTEGIDO / BLOQUEADO
+          </span>
+
+          {/* Locked Message */}
+          <h2 className="text-2xl font-black text-white tracking-tight mb-3">
+            Acesso Restrito ao Sistema
+          </h2>
+          <p className="text-sm text-slate-400 font-medium leading-relaxed mb-8">
+            Para utilizar esta ferramenta de otimização de filmes de recorte e montagem automática de layouts DTF, é necessário liberar a sua chave de licença de uso ativa.
+          </p>
+
+          {/* Contact Actions */}
+          <div className="space-y-3.5">
+            <a
+              href="https://wa.me/55119443152441?text=Olá!%20Gostaria%20de%20liberar%20meu%20acesso%20ao%20Gerador%20de%20Filmes%20de%20Recorte%20e%20DTF."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm py-4 px-6 rounded-2xl shadow-lg shadow-emerald-600/15 hover:shadow-emerald-600/25 transition-all duration-150 flex items-center justify-center gap-2.5 cursor-pointer active:scale-95"
+            >
+              <MessageSquare className="w-5 h-5 fill-current" />
+              Chamar no WhatsApp
+            </a>
+
+            <div className="bg-slate-950/60 border border-slate-800/60 p-4 rounded-2xl flex items-center justify-center gap-3">
+              <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="text-left">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Suporte Direto</p>
+                <p className="text-xs font-black text-slate-200 select-all font-mono">11 94431-52441</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Admin Unlock Key Toggle */}
+          <div className="mt-8 pt-6 border-t border-slate-800/60">
+            {!showPasscodeInput ? (
+              <button
+                type="button"
+                onClick={() => setShowPasscodeInput(true)}
+                className="text-xs text-slate-500 hover:text-slate-300 font-black transition-colors flex items-center gap-1.5 mx-auto"
+              >
+                <KeyRound className="w-3.5 h-3.5" />
+                Já possui uma chave? Ativar sistema
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <div className="relative">
+                  <input
+                    type="password"
+                    placeholder="Digite sua Chave de Acesso"
+                    value={passcode}
+                    onChange={(e) => setPasscode(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleUnlock();
+                    }}
+                    className={`w-full bg-slate-950 border text-center text-sm font-bold text-white px-4 py-3 rounded-xl focus:outline-none transition-colors ${
+                      passcodeError 
+                        ? 'border-rose-500 focus:border-rose-500 animate-pulse' 
+                        : 'border-slate-800 focus:border-slate-700'
+                    }`}
+                  />
+                  {passcodeError && (
+                    <span className="absolute -bottom-5 left-0 right-0 text-[10px] text-rose-500 font-bold">
+                      Chave inválida. Tente novamente!
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowPasscodeInput(false)}
+                    className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs py-2.5 px-3 rounded-xl transition-colors cursor-pointer"
+                  >
+                    Voltar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUnlock}
+                    className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs py-2.5 px-3 rounded-xl shadow-md transition-colors cursor-pointer"
+                  >
+                    Ativar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+    );
+  }
 
   if (authLoading) {
     return (
